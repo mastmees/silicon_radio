@@ -237,9 +237,9 @@ int main(void)
   PCICR=3;     // enable PCINT0,PCINT1
   set_sleep_mode(SLEEP_MODE_IDLE);
   sleep_enable();
-  // configure watchdog to interrupt&reset, 4 sec timeout
-  WDTCSR|=0x18;
-  WDTCSR=0xe8;
+  // configure watchdog to interrupt&reset
+  WDTCSR=(1<<WDE) | (1<<WDCE);
+  WDTCSR=(1<<WDE) | (1<<WDIE) | (1<<WDP2) | (1<<WDP1) | (1<<WDP0) ; // 2sec timout, interrupt+reset
   TCCR0B=5; // timer0 clock prescaler to 256
   TIMSK0=1; // enable overflow interrupts
   TCNT0=0xc0;
@@ -263,7 +263,7 @@ int main(void)
   while (1) {
     sleep_cpu(); // timer ot pin change interrupt wakes us up
     wdt_reset();
-    WDTCSR|=0x40;
+    WDTCSR=(1<<WDIE) | (1<<WDP2) | (1<<WDP1) | (1<<WDP0);
     switch (powerstate)
     {
       case STAY_ON:
